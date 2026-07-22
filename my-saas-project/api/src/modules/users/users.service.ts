@@ -24,7 +24,7 @@ export class UsersService {
         });
     }
 
-    async findone(id: number){
+    async findOne(id: number){
         const user = await prisma.user.findUnique({
             where: { id },
             select: {

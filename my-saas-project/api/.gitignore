@@ -3,6 +3,9 @@
 /node_modules
 /build
 
+# inside api/.gitignore
+
+
 # Logs
 logs
 *.log
