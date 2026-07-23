@@ -11,7 +11,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
         PassportModule,
         JwtModule.register({
             secret: 'super-secret-key-change-me',
-            aignOptions: { expiresIn: '15m' },
+            signOptions: { expiresIn: '15m' },
         }),
     ],
     controllers: [AuthController],

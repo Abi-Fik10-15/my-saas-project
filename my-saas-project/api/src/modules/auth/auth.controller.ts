@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from '../../core/guards/jwt-auth.guard';
 import { RolesGuard } from '../../core/guards/roles.guard';
-import { Roles } from '../../core/guards/roles.decorator';
+import { Roles } from '../../core/decorators/role.decorator';
 
 @Controller('auth')
 export class AuthController {

@@ -1,12 +1,20 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaClient } from '../../generated/prisma/client';
-import * as bcrypt from 'bcrypt';
+import { Pool } from 'pg';
+import { PrismaPg } from '@prisma/adapter-pg';
 import Redis from 'ioredis';
 import { LoginDto } from './dto/login.dto';
 
-const prisma = new PrismaClient();
-// Connects to the Redis container running on port 6379
+// Import the client from your custom generated path
+import { PrismaClient } from '../../generated/prisma/client';
+
+// Set up the native Postgres connection pool
+const connectionString = process.env.DATABASE_URL;
+const pool = new Pool({ connectionString });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter }); 
+
+// Connects to the Redis container
 const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379'); 
 
 @Injectable()
@@ -16,7 +24,6 @@ export class AuthService {
   async login(loginDto: LoginDto) {
     const user = await prisma.user.findUnique({ where: { email: loginDto.email } });
     
-    // In a real flow, the password in the DB would be hashed during registration
     // const isPasswordValid = await bcrypt.compare(loginDto.password, user.password);
     const isPasswordValid = loginDto.password === user?.password; 
 
@@ -31,11 +38,9 @@ export class AuthService {
   }
 
   async logout(token: string) {
-    // Decode token to get expiration time
     const decoded: any = this.jwtService.decode(token);
     const timeToLive = decoded.exp - Math.floor(Date.now() / 1000);
     
-    // Add token to Redis blacklist until it expires natively
     if (timeToLive > 0) {
       await redis.set(`blacklist:${token}`, 'true', 'EX', timeToLive);
     }
