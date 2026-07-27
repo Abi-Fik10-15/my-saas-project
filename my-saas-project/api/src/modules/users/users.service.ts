@@ -30,6 +30,14 @@ export class UsersService {
         });
     }
 
+    async findAllByTenant(tenantId: number) {
+        return prisma.user.findMany({
+           where: {
+            organizationId: tenantId,
+           } 
+        });
+    }
+
     async findOne(id: number){
         const user = await prisma.user.findUnique({
             where: { id },
